@@ -1,0 +1,105 @@
+---
+title: "Calculating Capital Asset Pricing Model"
+author: "Eric Wang"
+date: "5 March 2018"
+output: html_document
+---
+
+
+The portfolio that I'm going to analysis consists:
+
+>+ SPY (S&P500 fund) weighted 25%
+>+ EFA (a non-US equities fund) weighted 25%
+>+ IJS (a small-cap value fund) weighted 20%
+>+ EEM (an emerging-mkts fund) weighted 20%
+>+ AGG (a bond fund) weighted 10%
+
+Then I need to find out the monthly returns of above mentioned portfolio, I copied code from <a href = "https://rviews.rstudio.com/2018/02/08/capm-beta/" title="portfolio monthly return">Monthly return</a>
+
+```{r}
+library(tidyquant)
+library(tidyverse)
+library(timetk)
+library(tibbletime)
+library(broom)
+
+symbols <- c("SPY","EFA", "IJS", "EEM","AGG")
+
+prices <- 
+  getSymbols(symbols, src = 'yahoo', 
+             from = "2013-01-01",
+             to = "2017-12-31",
+             auto.assign = TRUE, warnings = FALSE) %>% 
+  map(~Ad(get(.))) %>%
+  reduce(merge) %>% 
+  `colnames<-`(symbols)
+
+prices_monthly <- to.monthly(prices, indexAt = "last", OHLC = FALSE)
+
+asset_returns_xts <- na.omit(Return.calculate(prices_monthly, method = "log"))
+
+w <- c(0.25, 0.25, 0.20, 0.20, 0.10)
+
+portfolio_returns_xts_rebalanced_monthly <- 
+  Return.portfolio(asset_returns_xts, weights = w, rebalance_on = "months") %>%
+  `colnames<-`("returns") 
+
+asset_returns_long <-  
+  prices %>% 
+  to.monthly(indexAt = "last", OHLC = FALSE) %>% 
+  tk_tbl(preserve_index = TRUE, rename_index = "date") %>%
+  gather(asset, returns, -date) %>% 
+  group_by(asset) %>%  
+  mutate(returns = (log(returns) - log(lag(returns)))) %>% 
+  na.omit()
+
+portfolio_returns_tq_rebalanced_monthly <- 
+  asset_returns_long %>%
+  tq_portfolio(assets_col  = asset, 
+               returns_col = returns,
+               weights     = w,
+               col_rename  = "returns",
+               rebalance_on = "months")
+```
+
+Here, I'm going to use SPY ETF as the baseline of market return, effectively treating the S&P 500 as the market. Let's calculate our market return for SPY and save it as <code>market_return_xts</code>. 
+
+```{r}
+spy_monthly_xts <- 
+    getSymbols("SPY", 
+               src = 'yahoo', 
+               from = "2013-01-01", 
+               to = "2017-12-31",
+             auto.assign = TRUE, 
+             warnings = FALSE) %>% 
+    map(~Ad(get(.))) %>% 
+    reduce(merge) %>%
+    `colnames<-`("SPY") %>% 
+    to.monthly(indexAt = "last", OHLC = FALSE)
+
+market_returns_xts <-
+  Return.calculate(spy_monthly_xts, method = "log") %>% 
+  na.omit()
+```
+
+I will also need a <code>data.frame</code> object of market returns, and will convert the <code>xts</code> object using <code>tk_tbl(preserve_index = TRUE, rename_index = "date") from the timetk package.
+
+```{r}
+market_returns_tidy <-
+  market_returns_xts %>% tk_tbl(preserve_index = TRUE, rename_index = "date") %>% na.omit() %>% select(date, returns = SPY)
+
+head(market_returns_tidy)
+
+```
+
+```{r}
+portfolio_returns_tq_rebalanced_monthly %>% mutate(market_returns = market_returns_tidy$returns) %>% head()
+```
+
+Since above code doesn't throw any error message, we can assuem that portfolio data perfectly align with our market return data.
+
+following is the code and equation to calculate CAPM beta
+
+<code>$${\beta}_{portfolio} = cov(R_p, R_m)/\sigma_m $$</code>
+
+$${\beta}_{portfolio} = cov(R_p, R_m)/\sigma_m $$
