@@ -1,0 +1,3 @@
+"0","market_returns_tidy <-"
+"0","  market_returns_xts %>% tk_tbl(preserve_index = TRUE, rename_index = ""date"") %>% na.omit() %>% select(date, returns = SPY)"
+"0","head(market_returns_tidy)"

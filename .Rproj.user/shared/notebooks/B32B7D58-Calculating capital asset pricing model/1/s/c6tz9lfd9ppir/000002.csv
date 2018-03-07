@@ -1,0 +1,144 @@
+"0","library(tidyquant)"
+"2","package ‘tidyquant’ was built under R version 3.4.3"
+"2","Loading required package: lubridate
+"
+"2","package ‘lubridate’ was built under R version 3.4.3"
+"2","
+Attaching package: ‘lubridate’
+
+"
+"2","The following object is masked from ‘package:base’:
+
+    date
+
+"
+"2","Loading required package: PerformanceAnalytics
+"
+"2","package ‘PerformanceAnalytics’ was built under R version 3.4.3"
+"2","Loading required package: xts
+"
+"2","package ‘xts’ was built under R version 3.4.3"
+"2","Loading required package: zoo
+"
+"2","
+Attaching package: ‘zoo’
+
+"
+"2","The following objects are masked from ‘package:base’:
+
+    as.Date, as.Date.numeric
+
+"
+"2","
+Package PerformanceAnalytics (1.5.2) loaded.
+Copyright (c) 2004-2018 Peter Carl and Brian G. Peterson, GPL-2 | GPL-3
+https://github.com/braverock/PerformanceAnalytics
+
+"
+"2","
+Attaching package: ‘PerformanceAnalytics’
+
+"
+"2","The following object is masked from ‘package:graphics’:
+
+    legend
+
+"
+"2","Loading required package: quantmod
+"
+"2","package ‘quantmod’ was built under R version 3.4.3"
+"2","Loading required package: TTR
+"
+"2","package ‘TTR’ was built under R version 3.4.3"
+"2","Version 0.4-0 included new data defaults. See ?getSymbols.
+Learn from a quantmod author: https://www.datacamp.com/courses/importing-and-managing-financial-data-in-r
+"
+"2","Loading required package: tidyverse
+"
+"2","package ‘tidyverse’ was built under R version 3.4.3"
+"2","-- Attaching packages -------------------------------------------------------------------------- tidyverse 1.2.1 --
+"
+"2","v ggplot2 2.2.1     v purrr   0.2.4
+v tibble  1.4.2     v dplyr   0.7.4
+v tidyr   0.8.0     v stringr 1.2.0
+v readr   1.1.1     v forcats 0.3.0
+"
+"2","package ‘tibble’ was built under R version 3.4.3"
+"2","package ‘tidyr’ was built under R version 3.4.3"
+"2","package ‘readr’ was built under R version 3.4.3"
+"2","package ‘purrr’ was built under R version 3.4.3"
+"2","package ‘dplyr’ was built under R version 3.4.3"
+"2","package ‘forcats’ was built under R version 3.4.3"
+"2","-- Conflicts ----------------------------------------------------------------------------- tidyverse_conflicts() --
+x lubridate::as.difftime() masks base::as.difftime()
+x lubridate::date()        masks base::date()
+x dplyr::filter()          masks stats::filter()
+x dplyr::first()           masks xts::first()
+x lubridate::intersect()   masks base::intersect()
+x dplyr::lag()             masks stats::lag()
+x dplyr::last()            masks xts::last()
+x lubridate::setdiff()     masks base::setdiff()
+x lubridate::union()       masks base::union()
+"
+"0","library(tidyverse)"
+"0","library(timetk)"
+"2","package ‘timetk’ was built under R version 3.4.3"
+"0","library(tibbletime)"
+"2","package ‘tibbletime’ was built under R version 3.4.3"
+"2","
+Attaching package: ‘tibbletime’
+
+"
+"2","The following object is masked from ‘package:stats’:
+
+    filter
+
+"
+"0","library(broom)"
+"2","package ‘broom’ was built under R version 3.4.3"
+"0","symbols <- c(""SPY"",""EFA"", ""IJS"", ""EEM"",""AGG"")"
+"0","prices <- "
+"0","  getSymbols(symbols, src = 'yahoo', "
+"0","             from = ""2013-01-01"","
+"0","             to = ""2017-12-31"","
+"0","             auto.assign = TRUE, warnings = FALSE) %>% "
+"0","  map(~Ad(get(.))) %>%"
+"0","  reduce(merge) %>% "
+"0","  `colnames<-`(symbols)"
+"2","‘getSymbols’ currently uses auto.assign=TRUE by default, but will
+use auto.assign=FALSE in 0.5-0. You will still be able to use
+‘loadSymbols’ to automatically load data. getOption(""getSymbols.env"")
+and getOption(""getSymbols.auto.assign"") will still be checked for
+alternate defaults.
+
+This message is shown once per session and may be disabled by setting 
+options(""getSymbols.warning4.0""=FALSE). See ?getSymbols for details.
+"
+"2","
+WARNING: There have been significant changes to Yahoo Finance data.
+Please see the Warning section of ‘?getSymbols.yahoo’ for details.
+
+This message is shown once per session and may be disabled by setting
+options(""getSymbols.yahoo.warning""=FALSE).
+"
+"0","prices_monthly <- to.monthly(prices, indexAt = ""last"", OHLC = FALSE)"
+"0","asset_returns_xts <- na.omit(Return.calculate(prices_monthly, method = ""log""))"
+"0","w <- c(0.25, 0.25, 0.20, 0.20, 0.10)"
+"0","portfolio_returns_xts_rebalanced_monthly <- "
+"0","  Return.portfolio(asset_returns_xts, weights = w, rebalance_on = ""months"") %>%"
+"0","  `colnames<-`(""returns"") "
+"0","asset_returns_long <-  "
+"0","  prices %>% "
+"0","  to.monthly(indexAt = ""last"", OHLC = FALSE) %>% "
+"0","  tk_tbl(preserve_index = TRUE, rename_index = ""date"") %>%"
+"0","  gather(asset, returns, -date) %>% "
+"0","  group_by(asset) %>%  "
+"0","  mutate(returns = (log(returns) - log(lag(returns)))) %>% "
+"0","  na.omit()"
+"0","portfolio_returns_tq_rebalanced_monthly <- "
+"0","  asset_returns_long %>%"
+"0","  tq_portfolio(assets_col  = asset, "
+"0","               returns_col = returns,"
+"0","               weights     = w,"
+"0","               col_rename  = ""returns"","
+"0","               rebalance_on = ""months"")"

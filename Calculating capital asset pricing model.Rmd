@@ -103,3 +103,33 @@ following is the code and equation to calculate CAPM beta
 <code>$${\beta}_{portfolio} = cov(R_p, R_m)/\sigma_m $$</code>
 
 $${\beta}_{portfolio} = cov(R_p, R_m)/\sigma_m $$
+
+Portfolio beta is equals to the covariance of the portfolio returns and market returns, divided by the variance of market returns. 
+
+Hence, our portfolio beta can be calculated as:
+
+<code>cov(portfolio_returns_xts_rebalanced_monthly, market_returns_tidy$returns)/var(market_returns_tidy$returns)</code>
+
+```{r}
+cov(portfolio_returns_xts_rebalanced_monthly, market_returns_tidy$returns)/var(market_returns_tidy$returns)
+```
+
+The beta is close to 1 which is as expected since we are using SPY itself as a baseline for the market return, which is also has a big proportion in our portfolio. 
+
+Accroding to this site: https://www.investopedia.com/articles/01/102401.asp
+
+Here ae the possible values and the corrresponding interpretation of beta:
+
+>- Negative beta - A beta less than 0, which would indicate an inverse relation to the market - is possible but highly unlikely. However, some investors believe that gold and gold stocks should have negative betas because they tended to do better when the stock market declines.
+- Beta of 0 - Basically, cash has a beta of 0. In other words, regardless of which way the market moves, the value of cash remains unchanged (given no inflation).
+Beta between 0 and 1 - Companies with volatilities lower than the market have a beta of less than 1 (but more than 0). As we mentioned earlier, many utilities fall in this range.
+- Beta of 1 - A beta of 1 represents the volatility of the given index used to represent the overall market, against which other stocks and their betas are measured. The S&P 500 is such an index. If a stock has a beta of one, it will move the same amount and direction as the index. So, an index fund that mirrors the S&P 500 will have a beta close to 1.
+Beta greater than 1 - This denotes a volatility that is greater than the broad-based index. Again, as we mentioned above, many technology companies on the Nasdaq have a beta higher than 1.
+- Beta greater than 100 - This is impossible as it essentially denotes a volatility that is 100 times greater than the market. If a stock had a beta of 100, it would be expected to go to 0 on any decline in the stock market. If you ever see a beta of over 100 on a research site it is usually the result of a statistical error, or the given stock has experienced large swings due to low liquidity, such as an over-the-counter stock. For the most part, stocks of well-known companies rarely ever have a beta higher than 
+
+Another way to calculate beta is to calculate beta for each individual asset and multiplying by asset weights. Here is the equation: <code>$${\beta}_{portfolio} ={\sum_{i=1}^n}W _i~{\beta}_i $$</code>
+
+$${\beta}_{portfolio} ={\sum_{i=1}^n}W _i~{\beta}_i $$
+
+
+
