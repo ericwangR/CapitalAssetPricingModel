@@ -30,15 +30,6 @@ Attaching package: ‘zoo’
 
 "
 "2","
-Attaching package: ‘xts’
-
-"
-"2","The following objects are masked from ‘package:dplyr’:
-
-    first, last
-
-"
-"2","
 Package PerformanceAnalytics (1.5.2) loaded.
 Copyright (c) 2004-2018 Peter Carl and Brian G. Peterson, GPL-2 | GPL-3
 https://github.com/braverock/PerformanceAnalytics
@@ -61,6 +52,33 @@ Attaching package: ‘PerformanceAnalytics’
 "2","package ‘TTR’ was built under R version 3.4.3"
 "2","Version 0.4-0 included new data defaults. See ?getSymbols.
 Learn from a quantmod author: https://www.datacamp.com/courses/importing-and-managing-financial-data-in-r
+"
+"2","Loading required package: tidyverse
+"
+"2","package ‘tidyverse’ was built under R version 3.4.3"
+"2","-- Attaching packages -------------------------------------------------------------------------- tidyverse 1.2.1 --
+"
+"2","v ggplot2 2.2.1     v purrr   0.2.4
+v tibble  1.4.2     v dplyr   0.7.4
+v tidyr   0.8.0     v stringr 1.2.0
+v readr   1.1.1     v forcats 0.3.0
+"
+"2","package ‘tibble’ was built under R version 3.4.3"
+"2","package ‘tidyr’ was built under R version 3.4.3"
+"2","package ‘readr’ was built under R version 3.4.3"
+"2","package ‘purrr’ was built under R version 3.4.3"
+"2","package ‘dplyr’ was built under R version 3.4.3"
+"2","package ‘forcats’ was built under R version 3.4.3"
+"2","-- Conflicts ----------------------------------------------------------------------------- tidyverse_conflicts() --
+x lubridate::as.difftime() masks base::as.difftime()
+x lubridate::date()        masks base::date()
+x dplyr::filter()          masks stats::filter()
+x dplyr::first()           masks xts::first()
+x lubridate::intersect()   masks base::intersect()
+x dplyr::lag()             masks stats::lag()
+x dplyr::last()            masks xts::last()
+x lubridate::setdiff()     masks base::setdiff()
+x lubridate::union()       masks base::union()
 "
 "0","library(tidyverse)"
 "0","library(timetk)"
