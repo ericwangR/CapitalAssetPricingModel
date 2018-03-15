@@ -131,5 +131,99 @@ Another way to calculate beta is to calculate beta for each individual asset and
 
 $${\beta}_{portfolio} ={\sum_{i=1}^n}W _i~{\beta}_i $$
 
+We need to regress of our individual asset returns on the market return. We can do <code>lm(asset_return_1 ~ market_returns_tidy$return)</code>, and then do asset_return_2 ... but to be more efficient, we can use <code>map()</code) function to regress all of our assets and calculate betas with one call. 
 
+We will start with our <code>asset_returns_long</code> tidy data frame and will then run nest<code>(~asset)</code>
+
+```{r}
+beta_assets <-
+  asset_returns_long %>% 
+  na.omit() %>%
+  nest(-asset)
+
+beta_assets
+```
+
+Now all asset returns are nested in one column of the corresponding asset name, hence we can use <code>map()</code> to apply a function to each of these nested lists and store the results in a new column via the <code>mutate(),/code> function. The whole piped command is <code>mutate(model = map(data, ~ lm(returns ~ market_returns_tidy$returns, data = .)))</code>
+
+```{r}
+beta_assets <-
+  asset_returns_long %>% 
+  na.omit() %>% 
+  nest(-asset) %>%
+  mutate(model = map(data, ~ lm(returns ~ market_returns_tidy$returns, data = .)))
+
+beta_assets
+```
+
+We can then tidy our results by using <code>tidy()</code> from <code>broom</code> package. Following call will be used <code>mutate(model = map(model, tidy))</code>
+
+```{r}
+beta_assets <-
+  asset_returns_long %>%
+  na.omit() %>%
+  nest(-asset) %>%
+  mutate(model = map(data, ~ lm(returns ~ market_returns_tidy$returns, data = .))) %>%
+  mutate(model = map(model, tidy))
+
+beta_assets
+```
+
+Let's unnest the model data frame
+
+```{r}
+beta_assets <-
+  asset_returns_long %>%
+  na.omit() %>%
+  nest(-asset) %>%
+  mutate(model = map(data, ~ lm(returns ~ market_returns_tidy$returns, data = .))) %>% 
+  mutate(model = map(model, tidy)) %>%
+  unnest(model)
+
+beta_assets
+```
+
+and we are going to remove the intercept
+
+```{r}
+beta_assets <- 
+  asset_returns_long %>%
+  na.omit() %>% 
+  nest(-asset) %>%
+  mutate(model = map(data, ~lm(returns ~ market_returns_tidy$returns, data = .))) %>%
+  mutate(model = map(model, tidy)) %>%
+  unnest(model) %>%
+  filter(term == "market_returns_tidy$returns") %>%
+  select(-term)
+
+beta_assets
+```
+
+A sanity check on the asset beta should reveal that SPY has beta of 1
+
+```{r}
+beta_assets %>% select(asset, estimate) %>% filter(asset == "SPY")
+```
+
+Let's weight each portfolio's beta by their proportion
+
+```{r}
+w <- c(0.25, 0.25, 0.20, 0.20, 0.10)
+
+beta_byhand <- 
+  w[1] * beta_assets$estimate[1] + 
+  w[2] * beta_assets$estimate[2] + 
+  w[3] * beta_assets$estimate[3] +
+  w[4] * beta_assets$estimate[4] +
+  w[5] * beta_assets$estimate[5]
+
+beta_byhand
+
+```
+
+```{r}
+data.frame(c(beta_auto, beta_byhand), row.names = c("auto", "byhand"))
+```
+
+Following we are going to calculate beta in both <code>dplyr</code> and <code>tidyquant</code> world.
 
