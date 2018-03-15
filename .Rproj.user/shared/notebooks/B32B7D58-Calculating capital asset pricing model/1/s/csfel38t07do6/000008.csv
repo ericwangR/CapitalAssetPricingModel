@@ -1,7 +1,0 @@
-"0","beta_assets <-"
-"0","  asset_returns_long %>%"
-"0","  na.omit() %>%"
-"0","  nest(-asset) %>%"
-"0","  mutate(model = map(data, ~ lm(returns ~ market_returns_tidy$returns, data = .))) %>%"
-"0","  mutate(model = map(model, tidy))"
-"0","beta_assets"
